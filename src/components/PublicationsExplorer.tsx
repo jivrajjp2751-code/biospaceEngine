@@ -1,0 +1,244 @@
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Search, Filter, Sparkles, Calendar, Tag, Loader2, Languages } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+const LANGUAGES = [
+  { code: "en", name: "English" },
+  { code: "hi", name: "Hindi" },
+  { code: "mr", name: "Marathi" },
+  { code: "gu", name: "Gujarati" },
+];
+
+// Mock data - in production this would come from an API
+const mockPublications = Array.from({ length: 608 }, (_, i) => ({
+  id: i + 1,
+  title: `NASA Bioscience Research Paper ${i + 1}: ${
+    [
+      "Microgravity Effects on Cellular Biology",
+      "Plant Growth in Space Environments",
+      "Radiation Protection Mechanisms",
+      "Human Adaptation to Long-Duration Spaceflight",
+      "Astrobiology and Extremophiles",
+      "Regenerative Medicine in Space",
+    ][i % 6]
+  }`,
+  year: 2020 + (i % 5),
+  topic: ["Cellular Biology", "Plant Science", "Radiation Biology", "Human Physiology", "Astrobiology", "Medicine"][i % 6],
+  impact: ["High", "Critical", "Medium"][i % 3],
+  summary: "This groundbreaking research explores the fundamental mechanisms of biological systems in space environments, with implications for future long-duration missions and human space exploration.",
+}));
+
+const PublicationsExplorer = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedYear, setSelectedYear] = useState("all");
+  const [selectedTopic, setSelectedTopic] = useState("all");
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [showSummary, setShowSummary] = useState<number | null>(null);
+  const [loadingSummary, setLoadingSummary] = useState<number | null>(null);
+  const [summaries, setSummaries] = useState<Record<number, string>>({});
+
+  const years = ["all", "2024", "2023", "2022", "2021", "2020"];
+  const topics = ["all", "Cellular Biology", "Plant Science", "Radiation Biology", "Human Physiology", "Astrobiology", "Medicine"];
+
+  const filteredPublications = mockPublications.filter((pub) => {
+    const matchesSearch = pub.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesYear = selectedYear === "all" || pub.year.toString() === selectedYear;
+    const matchesTopic = selectedTopic === "all" || pub.topic === selectedTopic;
+    return matchesSearch && matchesYear && matchesTopic;
+  });
+
+  const handleGetSummary = async (pubId: number, title: string) => {
+    const cacheKey = `${pubId}-${selectedLanguage}`;
+    
+    if (summaries[cacheKey]) {
+      setShowSummary(showSummary === pubId ? null : pubId);
+      return;
+    }
+
+    setLoadingSummary(pubId);
+    setShowSummary(pubId);
+
+    try {
+      const languageName = LANGUAGES.find(l => l.code === selectedLanguage)?.name || "English";
+      
+      const { data, error } = await supabase.functions.invoke("ai-chat", {
+        body: {
+          messages: [
+            {
+              role: "user",
+              content: `Generate a detailed, accurate summary for this NASA bioscience research paper: "${title}". Focus on key findings, methodology, and implications for space exploration. Be scientifically precise and comprehensive.`,
+            },
+          ],
+          type: "summary",
+          language: languageName,
+        },
+      });
+
+      if (error) {
+        console.error("Summary error:", error);
+        toast.error("Failed to generate summary. Please try again.");
+        return;
+      }
+
+      setSummaries((prev) => ({ ...prev, [cacheKey]: data.response }));
+    } catch (error) {
+      console.error("Error generating summary:", error);
+      toast.error("Failed to connect to AI service.");
+    } finally {
+      setLoadingSummary(null);
+    }
+  };
+
+  return (
+    <section id="explorer" className="py-20 px-4 bg-background">
+      <div className="container mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-aurora bg-clip-text text-transparent">
+            Explore Publications
+          </h2>
+          <p className="text-xl text-muted-foreground">
+            Browse through {mockPublications.length}+ NASA bioscience research papers
+          </p>
+        </div>
+
+        {/* Filters */}
+        <Card className="p-6 mb-8 bg-card/50 backdrop-blur-sm border-border shadow-card">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input
+                placeholder="Search publications..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-background/50 border-border"
+              />
+            </div>
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <SelectTrigger className="bg-background/50 border-border">
+                <Calendar className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Filter by year" />
+              </SelectTrigger>
+              <SelectContent>
+                {years.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year === "all" ? "All Years" : year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedTopic} onValueChange={setSelectedTopic}>
+              <SelectTrigger className="bg-background/50 border-border">
+                <Tag className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Filter by topic" />
+              </SelectTrigger>
+              <SelectContent>
+                {topics.map((topic) => (
+                  <SelectItem key={topic} value={topic}>
+                    {topic === "all" ? "All Topics" : topic}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+              <SelectTrigger className="bg-background/50 border-border">
+                <Languages className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Language" />
+              </SelectTrigger>
+              <SelectContent>
+                {LANGUAGES.map((lang) => (
+                  <SelectItem key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing {filteredPublications.length} of {mockPublications.length} publications
+            </p>
+            <Button variant="outline" size="sm" className="border-accent/50 hover:bg-accent/10">
+              <Filter className="w-4 h-4 mr-2" />
+              Advanced Filters
+            </Button>
+          </div>
+        </Card>
+
+        {/* Publications Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPublications.slice(0, 12).map((pub) => (
+            <Card 
+              key={pub.id}
+              className="p-6 bg-card/50 backdrop-blur-sm border-border hover:border-accent/50 hover:shadow-glow transition-all duration-300 group"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <Badge 
+                  variant="outline" 
+                  className={`
+                    ${pub.impact === "High" ? "border-accent/50 text-accent" : ""}
+                    ${pub.impact === "Critical" ? "border-secondary/50 text-secondary" : ""}
+                    ${pub.impact === "Medium" ? "border-primary/50 text-primary" : ""}
+                  `}
+                >
+                  {pub.impact} Impact
+                </Badge>
+                <span className="text-sm text-muted-foreground">{pub.year}</span>
+              </div>
+              
+              <h3 className="text-lg font-semibold mb-2 text-foreground group-hover:text-accent transition-colors line-clamp-2">
+                {pub.title}
+              </h3>
+              
+              <div className="flex items-center gap-2 mb-4">
+                <Tag className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">{pub.topic}</span>
+              </div>
+
+              {showSummary === pub.id && (
+                <div className="text-sm text-muted-foreground mb-4 animate-fade-in">
+                  {loadingSummary === pub.id ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Generating accurate AI summary in {LANGUAGES.find(l => l.code === selectedLanguage)?.name}...</span>
+                    </div>
+                  ) : (
+                    <p className="leading-relaxed">{summaries[`${pub.id}-${selectedLanguage}`] || pub.summary}</p>
+                  )}
+                </div>
+              )}
+              
+              <Button 
+                className="w-full bg-gradient-cosmic hover:opacity-90"
+                onClick={() => handleGetSummary(pub.id, pub.title)}
+                disabled={loadingSummary === pub.id}
+              >
+                {loadingSummary === pub.id ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4 mr-2" />
+                )}
+                {showSummary === pub.id ? "Hide Summary" : "AI Summary"}
+              </Button>
+            </Card>
+          ))}
+        </div>
+
+        {filteredPublications.length > 12 && (
+          <div className="text-center mt-12">
+            <Button size="lg" variant="outline" className="border-accent/50 hover:bg-accent/10">
+              Load More Publications
+            </Button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+export default PublicationsExplorer;
