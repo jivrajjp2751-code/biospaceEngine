@@ -91,7 +91,7 @@ const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your NASA Bioscience Research Assistant. I can help you explore publications, provide summaries, and translate content to Hindi, Marathi, and Gujarati. How can I assist you today?",
+      content: "Hello! I'm your NASA Bioscience Research Assistant. I can help you explore publications, provide summaries, and translate content to 50+ languages including all major Indian languages. How can I assist you today?",
     },
   ]);
   const [input, setInput] = useState("");
