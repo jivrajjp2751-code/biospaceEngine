@@ -9,10 +9,74 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const LANGUAGES = [
-  { code: "en", name: "English" },
-  { code: "hi", name: "Hindi" },
-  { code: "mr", name: "Marathi" },
-  { code: "gu", name: "Gujarati" },
+  // International
+  { code: "en", name: "English", native: "English" },
+  { code: "es", name: "Spanish", native: "Español" },
+  { code: "fr", name: "French", native: "Français" },
+  { code: "de", name: "German", native: "Deutsch" },
+  { code: "pt", name: "Portuguese", native: "Português" },
+  { code: "ru", name: "Russian", native: "Русский" },
+  { code: "ja", name: "Japanese", native: "日本語" },
+  { code: "ko", name: "Korean", native: "한국어" },
+  { code: "zh", name: "Chinese", native: "中文" },
+  { code: "ar", name: "Arabic", native: "العربية" },
+  
+  // Major Indian Languages
+  { code: "hi", name: "Hindi", native: "हिंदी" },
+  { code: "bn", name: "Bengali", native: "বাংলা" },
+  { code: "te", name: "Telugu", native: "తెలుగు" },
+  { code: "mr", name: "Marathi", native: "मराठी" },
+  { code: "ta", name: "Tamil", native: "தமிழ்" },
+  { code: "gu", name: "Gujarati", native: "ગુજરાતી" },
+  { code: "kn", name: "Kannada", native: "ಕನ್ನಡ" },
+  { code: "ml", name: "Malayalam", native: "മലയാളം" },
+  { code: "pa", name: "Punjabi", native: "ਪੰਜਾਬੀ" },
+  { code: "or", name: "Odia", native: "ଓଡ଼ିଆ" },
+  { code: "as", name: "Assamese", native: "অসমীয়া" },
+  { code: "ur", name: "Urdu", native: "اردو" },
+  
+  // Other Indian Languages
+  { code: "sa", name: "Sanskrit", native: "संस्कृतम्" },
+  { code: "ks", name: "Kashmiri", native: "कॉशुर" },
+  { code: "sd", name: "Sindhi", native: "سنڌي" },
+  { code: "ne", name: "Nepali", native: "नेपाली" },
+  { code: "kok", name: "Konkani", native: "कोंकणी" },
+  { code: "mai", name: "Maithili", native: "मैथिली" },
+  { code: "sat", name: "Santali", native: "ᱥᱟᱱᱛᱟᱲᱤ" },
+  { code: "mni", name: "Manipuri", native: "মৈতৈলোন্" },
+  { code: "brx", name: "Bodo", native: "बड़ो" },
+  { code: "doi", name: "Dogri", native: "डोगरी" },
+  
+  // Regional Indian Languages
+  { code: "bh", name: "Bhojpuri", native: "भोजपुरी" },
+  { code: "raj", name: "Rajasthani", native: "राजस्थानी" },
+  { code: "mag", name: "Magahi", native: "मगही" },
+  { code: "awh", name: "Awadhi", native: "अवधी" },
+  { code: "tcy", name: "Tulu", native: "ತುಳು" },
+  { code: "gom", name: "Goan Konkani", native: "गोंयची कोंकणी" },
+  { code: "kha", name: "Khasi", native: "Khasi" },
+  { code: "grt", name: "Garo", native: "Garo" },
+  { code: "lus", name: "Mizo", native: "Mizo ṭawng" },
+  { code: "nag", name: "Naga", native: "Naga" },
+  
+  // South Asian Languages
+  { code: "si", name: "Sinhala", native: "සිංහල" },
+  { code: "dv", name: "Dhivehi", native: "ދިވެހި" },
+  { code: "my", name: "Burmese", native: "မြန်မာဘာသာ" },
+  { code: "th", name: "Thai", native: "ไทย" },
+  { code: "vi", name: "Vietnamese", native: "Tiếng Việt" },
+  { code: "id", name: "Indonesian", native: "Bahasa Indonesia" },
+  { code: "ms", name: "Malay", native: "Bahasa Melayu" },
+  { code: "tl", name: "Tagalog", native: "Tagalog" },
+  
+  // Additional Languages
+  { code: "tr", name: "Turkish", native: "Türkçe" },
+  { code: "fa", name: "Persian", native: "فارسی" },
+  { code: "he", name: "Hebrew", native: "עברית" },
+  { code: "sw", name: "Swahili", native: "Kiswahili" },
+  { code: "pl", name: "Polish", native: "Polski" },
+  { code: "uk", name: "Ukrainian", native: "Українська" },
+  { code: "it", name: "Italian", native: "Italiano" },
 ];
 
 // Mock data - in production this would come from an API
@@ -150,10 +214,10 @@ const PublicationsExplorer = () => {
                 <Languages className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Language" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px]">
                 {LANGUAGES.map((lang) => (
                   <SelectItem key={lang.code} value={lang.code}>
-                    {lang.name}
+                    {lang.native} ({lang.name})
                   </SelectItem>
                 ))}
               </SelectContent>
