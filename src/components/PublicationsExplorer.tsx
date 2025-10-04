@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Search, Filter, Sparkles, Calendar, Tag, Loader2, Languages } from "luc
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { loadPublications, type Publication } from "@/utils/publicationsData";
 
 const LANGUAGES = [
   // International
@@ -79,26 +80,9 @@ const LANGUAGES = [
   { code: "it", name: "Italian", native: "Italiano" },
 ];
 
-// Mock data - in production this would come from an API
-const mockPublications = Array.from({ length: 608 }, (_, i) => ({
-  id: i + 1,
-  title: `NASA Bioscience Research Paper ${i + 1}: ${
-    [
-      "Microgravity Effects on Cellular Biology",
-      "Plant Growth in Space Environments",
-      "Radiation Protection Mechanisms",
-      "Human Adaptation to Long-Duration Spaceflight",
-      "Astrobiology and Extremophiles",
-      "Regenerative Medicine in Space",
-    ][i % 6]
-  }`,
-  year: 2020 + (i % 5),
-  topic: ["Cellular Biology", "Plant Science", "Radiation Biology", "Human Physiology", "Astrobiology", "Medicine"][i % 6],
-  impact: ["High", "Critical", "Medium"][i % 3],
-  summary: "This groundbreaking research explores the fundamental mechanisms of biological systems in space environments, with implications for future long-duration missions and human space exploration.",
-}));
 
 const PublicationsExplorer = () => {
+  const [publications, setPublications] = useState<Publication[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedTopic, setSelectedTopic] = useState("all");
@@ -106,11 +90,16 @@ const PublicationsExplorer = () => {
   const [showSummary, setShowSummary] = useState<number | null>(null);
   const [loadingSummary, setLoadingSummary] = useState<number | null>(null);
   const [summaries, setSummaries] = useState<Record<number, string>>({});
+  const [displayCount, setDisplayCount] = useState(12);
+
+  useEffect(() => {
+    loadPublications().then(setPublications);
+  }, []);
 
   const years = ["all", "2024", "2023", "2022", "2021", "2020"];
-  const topics = ["all", "Cellular Biology", "Plant Science", "Radiation Biology", "Human Physiology", "Astrobiology", "Medicine"];
+  const topics = ["all", "Bone & Skeletal", "Cellular Biology", "Plant Science", "Radiation Biology", "Human Physiology", "Microbiology", "Genomics", "Immunology", "Other"];
 
-  const filteredPublications = mockPublications.filter((pub) => {
+  const filteredPublications = publications.filter((pub) => {
     const matchesSearch = pub.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesYear = selectedYear === "all" || pub.year.toString() === selectedYear;
     const matchesTopic = selectedTopic === "all" || pub.topic === selectedTopic;
@@ -167,7 +156,7 @@ const PublicationsExplorer = () => {
             Explore Publications
           </h2>
           <p className="text-xl text-muted-foreground">
-            Browse through {mockPublications.length}+ NASA bioscience research papers
+            Browse through {publications.length} NASA bioscience research papers
           </p>
         </div>
 
@@ -225,18 +214,18 @@ const PublicationsExplorer = () => {
           </div>
           <div className="mt-4 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {filteredPublications.length} of {mockPublications.length} publications
+              Showing {Math.min(displayCount, filteredPublications.length)} of {filteredPublications.length} publications (Total: {publications.length})
             </p>
-            <Button variant="outline" size="sm" className="border-accent/50 hover:bg-accent/10">
-              <Filter className="w-4 h-4 mr-2" />
-              Advanced Filters
-            </Button>
+            <p className="text-sm text-accent">
+              <Languages className="w-4 h-4 inline mr-1" />
+              {LANGUAGES.length} languages available
+            </p>
           </div>
         </Card>
 
         {/* Publications Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPublications.slice(0, 12).map((pub) => (
+          {filteredPublications.slice(0, displayCount).map((pub) => (
             <Card 
               key={pub.id}
               className="p-6 bg-card/50 backdrop-blur-sm border-border hover:border-accent/50 hover:shadow-glow transition-all duration-300 group"
@@ -255,9 +244,14 @@ const PublicationsExplorer = () => {
                 <span className="text-sm text-muted-foreground">{pub.year}</span>
               </div>
               
-              <h3 className="text-lg font-semibold mb-2 text-foreground group-hover:text-accent transition-colors line-clamp-2">
+              <a 
+                href={pub.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-lg font-semibold mb-2 text-foreground group-hover:text-accent transition-colors line-clamp-2 hover:underline block"
+              >
                 {pub.title}
-              </h3>
+              </a>
               
               <div className="flex items-center gap-2 mb-4">
                 <Tag className="w-4 h-4 text-muted-foreground" />
@@ -272,7 +266,7 @@ const PublicationsExplorer = () => {
                       <span>Generating accurate AI summary in {LANGUAGES.find(l => l.code === selectedLanguage)?.name}...</span>
                     </div>
                   ) : (
-                    <p className="leading-relaxed">{summaries[`${pub.id}-${selectedLanguage}`] || pub.summary}</p>
+                    <p className="leading-relaxed">{summaries[`${pub.id}-${selectedLanguage}`]}</p>
                   )}
                 </div>
               )}
@@ -293,10 +287,15 @@ const PublicationsExplorer = () => {
           ))}
         </div>
 
-        {filteredPublications.length > 12 && (
+        {filteredPublications.length > displayCount && (
           <div className="text-center mt-12">
-            <Button size="lg" variant="outline" className="border-accent/50 hover:bg-accent/10">
-              Load More Publications
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-accent/50 hover:bg-accent/10"
+              onClick={() => setDisplayCount(prev => prev + 12)}
+            >
+              Load More Publications ({filteredPublications.length - displayCount} remaining)
             </Button>
           </div>
         )}
