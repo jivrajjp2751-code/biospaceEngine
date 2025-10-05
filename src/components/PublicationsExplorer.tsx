@@ -156,7 +156,7 @@ const PublicationsExplorer = () => {
             Explore Publications
           </h2>
           <p className="text-xl text-muted-foreground">
-            Browse through 600+ NASA bioscience research papers
+            Browse through 600+ research papers of NASA datasets
           </p>
         </div>
 
@@ -218,7 +218,7 @@ const PublicationsExplorer = () => {
             </p>
             <p className="text-sm text-accent">
               <Languages className="w-4 h-4 inline mr-1" />
-              {LANGUAGES.length} languages available
+              56+ Languages Available for AI Summaries
             </p>
           </div>
         </Card>
