@@ -23,11 +23,6 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-20 text-center animate-fade-in">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/50 backdrop-blur-sm border border-accent/30 mb-6 animate-glow-pulse">
-          <Sparkles className="w-4 h-4 text-accent" />
-          <span className="text-sm font-medium text-accent">AI-Powered Research Explorer</span>
-        </div>
-        
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-aurora bg-clip-text text-transparent leading-tight">
           NASA Bioscience
           <br />
