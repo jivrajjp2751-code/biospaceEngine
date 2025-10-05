@@ -156,7 +156,7 @@ const PublicationsExplorer = () => {
             Explore Publications
           </h2>
           <p className="text-xl text-muted-foreground">
-            Browse through {publications.length} NASA bioscience research papers
+            Browse through 600+ NASA bioscience research papers
           </p>
         </div>
 

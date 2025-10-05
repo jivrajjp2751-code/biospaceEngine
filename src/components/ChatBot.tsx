@@ -145,9 +145,10 @@ const ChatBot = () => {
   };
 
   const quickActions = [
-    { icon: HelpCircle, text: "How to use this app", query: "How do I use this platform?" },
-    { icon: Globe, text: "Change language", action: "language" },
-    { icon: MessageCircle, text: "Get a summary", query: "How do I get a summary?" },
+    { icon: HelpCircle, text: "How to use this app", query: "How do I use this platform to explore NASA research?" },
+    { icon: MessageCircle, text: "Get AI summary", query: "How can I get an AI-generated summary of publications?" },
+    { icon: Languages, text: "Available languages", query: "What languages are supported for summaries and translation?" },
+    { icon: Globe, text: "Filter publications", query: "How do I filter publications by year, topic, or search?" },
   ];
 
   return (
@@ -155,26 +156,35 @@ const ChatBot = () => {
       {/* Chat Button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-glow bg-gradient-cosmic hover:opacity-90 z-50"
-        size="icon"
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 h-16 px-8 rounded-full shadow-glow bg-gradient-cosmic hover:opacity-90 hover:scale-105 transition-all duration-300 z-50 flex items-center gap-3"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? (
+          <>
+            <X className="w-6 h-6" />
+            <span className="font-semibold">Close AI Assistant</span>
+          </>
+        ) : (
+          <>
+            <MessageCircle className="w-6 h-6" />
+            <span className="font-semibold">Ask AI Assistant</span>
+          </>
+        )}
       </Button>
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 w-96 h-[600px] flex flex-col shadow-card border-border bg-card/95 backdrop-blur-sm z-50 animate-slide-up">
+        <Card className="fixed bottom-32 left-1/2 -translate-x-1/2 w-[90vw] max-w-2xl h-[600px] flex flex-col shadow-card border-2 border-accent/30 bg-card/95 backdrop-blur-md z-50 animate-slide-up">
           {/* Header */}
-          <div className="p-4 border-b border-border bg-gradient-cosmic">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-accent" />
+          <div className="p-6 border-b border-accent/30 bg-gradient-cosmic">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-accent/30 flex items-center justify-center shadow-glow">
+                <MessageCircle className="w-6 h-6 text-primary-foreground" />
               </div>
-              <div>
-                <h3 className="font-semibold text-primary-foreground">AI Research Assistant</h3>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-primary-foreground">NASA AI Research Assistant</h3>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-xs text-primary-foreground/80">
-                    Language: {LANGUAGES.find(l => l.code === selectedLanguage)?.native}
+                  <p className="text-sm text-primary-foreground/90">
+                    🌍 Current: {LANGUAGES.find(l => l.code === selectedLanguage)?.native}
                   </p>
                 </div>
               </div>
@@ -182,10 +192,10 @@ const ChatBot = () => {
           </div>
 
           {/* Language Selector */}
-          <div className="p-3 border-b border-border bg-muted/20">
+          <div className="p-4 border-b border-accent/20 bg-gradient-to-r from-accent/5 to-primary/5">
             <div className="flex items-center gap-2 mb-2">
-              <Globe className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">Select Language</span>
+              <Languages className="w-5 h-5 text-accent" />
+              <span className="text-sm font-semibold text-foreground">Choose Your Language (56+ Available)</span>
             </div>
             <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
               <SelectTrigger className="bg-background/50 border-border">
@@ -202,13 +212,17 @@ const ChatBot = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="p-3 border-b border-border bg-muted/20">
-            <div className="flex flex-wrap gap-2">
+          <div className="p-4 border-b border-accent/20 bg-gradient-to-r from-primary/5 to-accent/5">
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-sm font-semibold text-foreground">✨ Quick Actions</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
               {quickActions.map((action, i) => (
-                <Badge
+                <Button
                   key={i}
                   variant="outline"
-                  className="cursor-pointer hover:bg-accent/10 transition-colors border-accent/30"
+                  size="sm"
+                  className="cursor-pointer hover:bg-accent/20 hover:border-accent transition-all hover:scale-105 border-accent/40 h-auto py-2 justify-start text-left"
                   onClick={() => {
                     if (action.query) {
                       setInput(action.query);
@@ -216,9 +230,9 @@ const ChatBot = () => {
                     }
                   }}
                 >
-                  <action.icon className="w-3 h-3 mr-1" />
-                  {action.text}
-                </Badge>
+                  <action.icon className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span className="text-xs">{action.text}</span>
+                </Button>
               ))}
             </div>
           </div>
