@@ -152,28 +152,31 @@ const ChatBot = () => {
   ];
 
   return (
-    <>
-      {/* Chat Button */}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 h-16 px-8 rounded-full shadow-glow bg-gradient-cosmic hover:opacity-90 hover:scale-105 transition-all duration-300 z-50 flex items-center gap-3"
-      >
-        {isOpen ? (
-          <>
-            <X className="w-6 h-6" />
-            <span className="font-semibold">Close AI Assistant</span>
-          </>
-        ) : (
-          <>
-            <MessageCircle className="w-6 h-6" />
-            <span className="font-semibold">Ask AI Assistant</span>
-          </>
-        )}
-      </Button>
+    <div className="fixed inset-0 z-50 pointer-events-none">
+      {/* Chat Button - Always visible at bottom center */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-auto">
+        <Button
+          onClick={() => setIsOpen(!isOpen)}
+          className="h-16 px-8 rounded-full shadow-glow bg-gradient-cosmic hover:opacity-90 hover:scale-105 transition-all duration-300 flex items-center gap-3"
+        >
+          {isOpen ? (
+            <>
+              <X className="w-6 h-6" />
+              <span className="font-semibold">Close AI Assistant</span>
+            </>
+          ) : (
+            <>
+              <MessageCircle className="w-6 h-6" />
+              <span className="font-semibold">Ask AI Assistant</span>
+            </>
+          )}
+        </Button>
+      </div>
 
-      {/* Chat Window */}
+      {/* Chat Window - Centered above button */}
       {isOpen && (
-        <Card className="fixed bottom-32 left-1/2 -translate-x-1/2 w-[90vw] max-w-2xl h-[600px] flex flex-col shadow-card border-2 border-accent/30 bg-card/95 backdrop-blur-md z-50 animate-slide-up">
+        <div className="absolute bottom-28 left-1/2 -translate-x-1/2 pointer-events-auto">
+          <Card className="w-[90vw] max-w-2xl h-[600px] flex flex-col shadow-card border-2 border-accent/30 bg-card/95 backdrop-blur-md animate-slide-up">
           {/* Header */}
           <div className="p-6 border-b border-accent/30 bg-gradient-cosmic">
             <div className="flex items-center gap-4">
@@ -279,9 +282,10 @@ const ChatBot = () => {
               </Button>
             </div>
           </div>
-        </Card>
+          </Card>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 

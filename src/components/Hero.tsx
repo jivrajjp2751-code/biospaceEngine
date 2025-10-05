@@ -35,8 +35,8 @@ const Hero = () => {
         </h1>
         
         <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed">
-          Explore 608+ groundbreaking NASA research papers with AI-powered summaries, 
-          multilingual support, and intelligent insights—all in one place.
+          Explore 600+ groundbreaking NASA research papers with AI-powered summaries, 
+          multilingual support in 56+ languages, and intelligent insights—all in one place.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -61,8 +61,8 @@ const Hero = () => {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-4xl mx-auto">
           {[
-            { num: "608+", label: "Research Papers" },
-            { num: "4", label: "Languages Available" },
+            { num: "600+", label: "Research Papers of NASA Datasets" },
+            { num: "56+", label: "Languages Available" },
             { num: "AI", label: "Powered Summaries" },
           ].map((stat, i) => (
             <div key={i} className="p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border shadow-card hover:shadow-glow transition-all duration-300">

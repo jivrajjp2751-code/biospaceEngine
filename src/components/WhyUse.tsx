@@ -10,7 +10,7 @@ const features = [
   {
     icon: Globe,
     title: "Multilingual Support",
-    description: "Access research in Hindi, Marathi, and Gujarati—making science accessible across India.",
+    description: "Access research in 56+ languages including all major Indian languages—making science accessible globally.",
   },
   {
     icon: TrendingUp,
@@ -30,7 +30,7 @@ const features = [
   {
     icon: Users,
     title: "Centralized Knowledge",
-    description: "All 608+ NASA bioscience publications organized in one comprehensive, easy-to-navigate dashboard.",
+    description: "All 600+ NASA bioscience research papers organized in one comprehensive, easy-to-navigate dashboard.",
   },
 ];
 
